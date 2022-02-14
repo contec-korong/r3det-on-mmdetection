@@ -16,12 +16,7 @@ class DOTADatasetV1(CustomDataset):
     """
         https://captain-whu.github.io/DOTA/dataset.html
     """
-    CLASSES = ('plane', 'baseball-diamond', 'bridge', 'ground-track-field',
-               'small-vehicle', 'large-vehicle', 'ship',
-               'tennis-court', 'basketball-court',
-               'storage-tank', 'soccer-ball-field',
-               'roundabout', 'harbor',
-               'swimming-pool', 'helicopter')
+    CLASSES = ('crane', 'small_ship', 'middle_ship', 'large_ship')
 
     def __init__(self, *args, **kwargs):
         self.difficulty_thresh = kwargs.pop('difficulty_thresh', 100)
