@@ -88,6 +88,17 @@ def rtpfp_default(det_bboxes,
             for i, (min_area, max_area) in enumerate(area_ranges):
                 fp[i, (det_areas >= min_area) & (det_areas < max_area)] = 1
         return tp, fp
+
+    wh_minus = np.where(det_bboxes < 0)
+    det_bboxes[wh_minus] = 0.1
+    wh_1024 = np.where(det_bboxes >= 1024)
+    det_bboxes[wh_1024] = 1023.9
+
+    wh_minus = np.where(gt_bboxes < 0)
+    gt_bboxes[wh_minus] = 0.1
+    wh_1024 = np.where(gt_bboxes >= 1024)
+    gt_bboxes[wh_1024] = 1023.9
+
     ious = polygon_overlaps(det_bboxes, gt_bboxes)
     # for each det, the max iou with all gts
     ious_max = ious.max(axis=1)
@@ -200,16 +211,28 @@ def reval_map(det_results,
     pool = Pool(nproc)
     eval_results = []
     for i in range(num_classes):
+        t_tp = ()
+        t_fp = ()
         # get gt and det bboxes of this class
         cls_dets, cls_gts, cls_gts_ignore = rget_cls_results(
             det_results, annotations, i)
 
-        tpfp = pool.starmap(
-            rtpfp_default,
-            zip(cls_dets, cls_gts, cls_gts_ignore,
-                [iou_thr for _ in range(num_imgs)],
-                [area_ranges for _ in range(num_imgs)]))
-        tp, fp = tuple(zip(*tpfp))
+        # Block working on thread
+        # tpfp = pool.starmap(
+        #     rtpfp_default,
+        #     zip(cls_dets, cls_gts, cls_gts_ignore,
+        #         [iou_thr for _ in range(num_imgs)],
+        #         [area_ranges for _ in range(num_imgs)]))
+        # tp, fp = tuple(zip(*tpfp))
+
+        # Activate working on non thread
+        for idx, _ in enumerate(cls_gts):
+            tp, fp = rtpfp_default(cls_dets[idx], cls_gts[idx], cls_gts[idx], 0.5, None)
+            t_tp = t_tp + tuple([tp])
+            t_fp = t_fp + tuple([fp])
+        tp = t_tp
+        fp = t_fp
+
         # calculate gt number of each scale
         # ignored gts or gts beyond the specific scale are not counted
         num_gts = np.zeros(num_scales, dtype=int)
