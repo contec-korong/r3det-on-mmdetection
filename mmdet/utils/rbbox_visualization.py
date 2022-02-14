@@ -5,6 +5,8 @@ import math
 from mmcv.image import imread, imwrite
 from mmcv.visualization.color import color_val
 
+color = [(0, 204, 255), (255, 204, 102), (0, 204, 0), (255, 0, 102)]
+color_idx = {'crane':0, 'small_ship':1, 'middle_ship':2, 'large_ship': 3}
 
 def imshow(img, win_name='', wait_time=0):
     """Show an image.
@@ -66,6 +68,8 @@ def imshow_det_rbboxes(img,
     text_color = color_val(text_color)
 
     for bbox, label in zip(bboxes, labels):
+        draw_color = color[label]
+
         xc, yc, w, h, ag, p = bbox.tolist()
         wx, wy = w / 2 * math.cos(ag), w / 2 * math.sin(ag)
         hx, hy = -h / 2 * math.sin(ag), h / 2 * math.cos(ag)
@@ -74,13 +78,13 @@ def imshow_det_rbboxes(img,
         p3 = (xc + wx + hx, yc + wy + hy)
         p4 = (xc - wx + hx, yc - wy + hy)
         ps = np.int0(np.array([p1, p2, p3, p4]))
-        cv2.drawContours(img, [ps], -1, bbox_color, thickness=thickness)
+        cv2.drawContours(img, [ps], -1, draw_color, thickness=thickness)
         label_text = class_names[
             label] if class_names is not None else 'cls {}'.format(label)
         if len(bbox) > 5:
             label_text += '|{:.02f}'.format(bbox[-1])
         cv2.putText(img, label_text, (int(p1[0]), int(p1[1])),
-                    cv2.FONT_HERSHEY_COMPLEX, font_scale, text_color)
+                    cv2.FONT_HERSHEY_COMPLEX, 0.25, draw_color)
 
     if show:
         imshow(img, win_name, wait_time)
