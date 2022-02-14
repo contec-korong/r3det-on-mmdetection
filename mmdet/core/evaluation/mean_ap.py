@@ -1,7 +1,9 @@
 from multiprocessing import Pool
 
+import os
 import mmcv
 import numpy as np
+import csv
 from mmcv.utils import print_log
 from terminaltables import AsciiTable
 
@@ -442,6 +444,14 @@ def print_map_summary(mean_ap,
         mean_ap = [mean_ap]
 
     header = ['class', 'gts', 'dets', 'recall', 'ap']
+    ap = ['crane', 'middle_ship', 'large_ship', 'mAP']
+
+    save_file = '/home/dhkim/work/r3det-on-mmdetection/work_dirs/r3det_r50_fpn_2x_768_3aug/ap_eval.csv'
+    if not os.path.exists(save_file):
+        with open(save_file, 'w') as init_file:
+            init = csv.writer(init_file)
+            init.writerow(ap)
+
     for i in range(num_scales):
         if scale_ranges is not None:
             print_log(f'Scale range {scale_ranges[i]}', logger=logger)
@@ -452,7 +462,13 @@ def print_map_summary(mean_ap,
                 f'{recalls[i, j]:.3f}', f'{aps[i, j]:.3f}'
             ]
             table_data.append(row_data)
+
         table_data.append(['mAP', '', '', '', f'{mean_ap[i]:.3f}'])
         table = AsciiTable(table_data)
         table.inner_footing_row_border = True
         print_log('\n' + table.table, logger=logger)
+
+        csv_data = [table_data[1][4], table_data[2][4], table_data[3][4], table_data[4][4]]
+        with open(save_file, 'a', newline='') as myfile:
+            wr = csv.writer(myfile)
+            wr.writerow(csv_data)
