@@ -11,5 +11,5 @@ lr_config = dict(
     warmup='linear',
     warmup_iters=5000,
     warmup_ratio=0.1,
-    step=[12, 16, 20, 24, 28, 32, 36])
-total_epochs = 40
+    step=[12, 24, 36, 48])
+total_epochs = 50

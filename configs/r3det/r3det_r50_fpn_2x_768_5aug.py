@@ -1,14 +1,14 @@
 _base_ = [
     'models/r3det_r50_fpn.py',
-    'datasets/dotav1_rotational_detection.py',
-    'schedules/schedule_1x.py'
+    'datasets/768_5aug_rotational_detection.py',
+    'schedules/schedule_1x_768.py'
 ]
 
 # runtime settings
 checkpoint_config = dict(interval=1)
 # yapf:disable
 log_config = dict(
-    interval=50,
+    interval=10,
     hooks=[
         dict(type='TextLoggerHook'),
         # dict(type='TensorboardLoggerHook')
@@ -19,5 +19,5 @@ log_level = 'INFO'
 load_from = None
 resume_from = None
 workflow = [('train', 1)]
-work_dir = './work_dirs/r3det_r50_fpn_2x_20200616'
+work_dir = './work_dirs/r3det_r50_fpn_2x_768_5aug'
 evaluation = dict(interval=1, metric='mAP')

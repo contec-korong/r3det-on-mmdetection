@@ -1,7 +1,7 @@
 _base_ = [
     'models/r3det_r50_fpn.py',
-    'datasets/dotav1_rotational_detection.py',
-    'schedules/schedule_1x.py'
+    'datasets/768_3aug_rotational_detection.py',
+    'schedules/schedule_1x_768.py'
 ]
 
 # runtime settings
@@ -19,5 +19,5 @@ log_level = 'INFO'
 load_from = None
 resume_from = None
 workflow = [('train', 1)]
-work_dir = './work_dirs/r3det_r50_fpn_2x_20200614'
+work_dir = './work_dirs/r3det_r50_fpn_2x_768_3aug'
 evaluation = dict(interval=1, metric='mAP')
